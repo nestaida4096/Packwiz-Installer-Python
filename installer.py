@@ -259,8 +259,9 @@ class InstallerWindow:
         self.language_button.pack(side="left")
         self.options_button = tk.Button(footer, text=self.tr("オプション...", "Options..."),
             command=self._show_options, relief="flat", bg=self.BG, fg="#1769aa")
-        self.options_button.pack(side="right")
         self.options_button.pack_forget()
+        if self.installer.optional_files():
+            self.options_button.pack(side="right")
 
     def _toggle_language(self):
         self.language = "en" if self.language == "ja" else "ja"

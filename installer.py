@@ -209,7 +209,8 @@ class InstallerWindow:
         self.language = language
         self.messages = queue.Queue()
         self.options_open = False
-        self.remaining = 10
+        self.remaining = 10.0
+        self.last_countdown_tick = time.monotonic()
         self.started = False
         self.selected: set[str] | None = None
         self.root = tk.Tk()
@@ -316,16 +317,20 @@ class InstallerWindow:
         except queue.Empty:
             pass
         if not self.started and not self.options_open:
+            now = time.monotonic()
+            self.remaining = max(0.0, self.remaining - (now - self.last_countdown_tick))
+            self.last_countdown_tick = now
             if self.remaining > 0:
+                seconds = int(self.remaining + 0.999)
                 self.status.configure(text=self.tr(
-                    f"任意 Mod を選択できます（{self.remaining} 秒後に開始）",
-                    f"Optional mods available ({self.remaining}s until start)"))
-                self.remaining -= 1
-                self.root.after(1000, self._poll)
+                    f"任意 Mod を選択できます（{seconds} 秒後に開始）",
+                    f"Optional mods available ({seconds}s until start)"))
+                self.root.after(100, self._poll)
                 return
             self._start_install()
         elif not self.started:
-            self.root.after(250, self._poll)
+            self.last_countdown_tick = time.monotonic()
+            self.root.after(100, self._poll)
             return
         self.root.after(100, self._poll)
 

@@ -53,12 +53,15 @@ def main(argv: list[str] | None = None) -> int:
 
         # Preserve the launcher's working directory so the installer targets the
         # same Minecraft instance directory as the launcher.
-        subprocess.Popen(
+        # Wait until the installer window is closed and the child process exits.
+        # Returning immediately here would let launchers continue starting
+        # Minecraft before the modpack update/install has finished.
+        completed = subprocess.run(
             [str(installer_path), *forwarded_args],
             cwd=os.getcwd(),
-            close_fds=True,
+            check=False,
         )
-        return 0
+        return completed.returncode
     except (OSError, urllib.error.URLError, KeyError, StopIteration, RuntimeError) as exc:
         print(f"Packwiz Installer Bootstrap error: {exc}", file=sys.stderr)
         return 1

@@ -11,7 +11,8 @@ from pathlib import Path
 
 REPOSITORY = "nestaida4096/Packwiz-Installer-Python"
 ASSET_NAME = "Packwiz-Installer.exe"
-USER_AGENT = "Packwiz-Installer-Bootstrap/0.1"
+APP_VERSION = "1.0.3"
+USER_AGENT = f"Packwiz-Installer-Bootstrap/{APP_VERSION}"
 
 
 def request_json(url: str) -> dict:

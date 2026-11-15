@@ -7,6 +7,8 @@ Python/Tkinter implementation of a two-stage Packwiz installer for Windows.
 - **Bootstrap** checks the latest GitHub Release and downloads the published Installer executable.
 - **Installer** reads `pack.toml`, validates `index.toml` and file hashes, resolves `*.pw.toml` metadata, and installs files into the current working directory.
 
+The bootstrap forwards the arguments it receives to the Installer and waits for the Installer process to exit before returning. Launchers can therefore use the Bootstrap process lifetime to wait until the update/installation is complete and the Installer window has been closed. The Bootstrap returns the Installer's exit code.
+
 The bootstrap forwards the arguments it receives to the Installer. For example:
 
 ```bat

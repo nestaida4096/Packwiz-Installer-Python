@@ -311,18 +311,20 @@ class InstallerWindow:
         body = tk.Frame(self.root, bg=self.BG, padx=30, pady=24)
         body.pack(fill="both", expand=True)
 
-        self._label(
+        self.heading = self._label(
             body, self.tr("Modpack のインストール", "Installing modpack"),
             size=16, weight="bold", bg=self.BG,
-        ).pack(anchor="w")
-        self._label(
+        )
+        self.heading.pack(anchor="w")
+        self.intro = self._label(
             body,
             self.tr(
                 "必要なファイルを確認し、安全にダウンロードしています。",
                 "Verifying and downloading the required files.",
             ),
             size=9, color=self.MUTED, bg=self.BG,
-        ).pack(anchor="w", pady=(5, 18))
+        )
+        self.intro.pack(anchor="w", pady=(5, 18))
 
         card = tk.Frame(
             body, bg=self.CARD, highlightthickness=1,
@@ -394,12 +396,37 @@ class InstallerWindow:
 
     def _toggle_language(self):
         self.language = "en" if self.language == "ja" else "ja"
+        self.heading.configure(
+            text=self.tr("Modpack のインストール", "Installing modpack")
+        )
+        self.intro.configure(text=self.tr(
+            "必要なファイルを確認し、安全にダウンロードしています。",
+            "Verifying and downloading the required files.",
+        ))
+        self.action_button.configure(
+            text=self.tr("閉じる", "Close")
+        )
         if self.optional:
             self.options_button.configure(
                 text=self.tr("オプションを選択", "Choose options")
             )
         if not self.started:
             self._update_countdown_text()
+        elif not self.finished:
+            self.status.configure(text=self.tr(
+                "ファイルをインストールしています",
+                "Installing files",
+            ))
+        elif self.result_code == 0:
+            self.status.configure(text=self.tr(
+                "インストールが完了しました", "Installation completed"
+            ))
+            self.progress_text.configure(text=self.tr("完了", "Complete"))
+        else:
+            self.status.configure(text=self.tr(
+                "インストールに失敗しました", "Installation failed"
+            ))
+            self.progress_text.configure(text=self.tr("エラー", "Error"))
 
     def _update_countdown_text(self):
         if not self.optional or self.started:

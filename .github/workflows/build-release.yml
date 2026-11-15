@@ -1,0 +1,75 @@
+name: Build and Release Windows EXE
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Validate Python sources
+        run: python -m compileall -q bootstrap.py installer.py
+
+      - name: Build Installer executable
+        run: python -m PyInstaller --clean --noconfirm --onefile --noconsole --name Packwiz-Installer installer.py
+
+      - name: Build Bootstrap executable
+        run: python -m PyInstaller --clean --noconfirm --onefile --noconsole --name Packwiz-Installer-Bootstrap bootstrap.py
+
+      - name: Verify build outputs
+        shell: pwsh
+        run: |
+          $files = @(
+            "dist/Packwiz-Installer.exe",
+            "dist/Packwiz-Installer-Bootstrap.exe"
+          )
+          foreach ($file in $files) {
+            if (-not (Test-Path $file)) {
+              throw "Build output missing: $file"
+            }
+            $item = Get-Item $file
+            if ($item.Length -le 0) {
+              throw "Build output is empty: $file"
+            }
+            Write-Host "$($item.Name): $($item.Length) bytes"
+          }
+
+      - name: Upload executable artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Packwiz-Installer-Windows-${{ github.ref_name }}
+          path: |
+            dist/Packwiz-Installer.exe
+            dist/Packwiz-Installer-Bootstrap.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            dist/Packwiz-Installer.exe
+            dist/Packwiz-Installer-Bootstrap.exe

@@ -26,7 +26,9 @@ When optional mods are present, the GUI displays an options button and starts a 
 
 ## Automated Windows build and release
 
-GitHub Actions builds both Windows executables automatically when a version tag beginning with `v` is pushed.
+GitHub Actions builds both Windows executables on every push to `main`. The EXEs are attached to that workflow run as downloadable Artifacts. When a version tag beginning with `v` is pushed, the same workflow also creates a GitHub Release and attaches both EXEs.
+
+**Important:** a tag created before `.github/workflows/build-release.yml` existed will not retroactively trigger that workflow. For such an existing tag, open **Actions → Build and Release Windows EXE → Run workflow**, enter the existing tag in `release_tag` (for example `v1.0.1`), and start the run. The workflow checks out that tag, rebuilds it, and publishes the two EXEs to its Release.
 
 1. Commit and push the source changes to `main`.
 2. Create and push a version tag, for example:

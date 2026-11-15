@@ -24,7 +24,28 @@ Supported options:
 
 When optional mods are present, the GUI displays an options button and starts a 10-second countdown. Opening the options dialog pauses the countdown. The selected options are then used for the installation.
 
-## Development
+## Automated Windows build and release
+
+GitHub Actions builds both Windows executables automatically when a version tag beginning with `v` is pushed.
+
+1. Commit and push the source changes to `main`.
+2. Create and push a version tag, for example:
+
+   ```powershell
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+3. GitHub Actions builds the EXEs on a Windows runner and creates a GitHub Release for that tag.
+4. The release contains these exact assets:
+   - `Packwiz-Installer.exe`
+   - `Packwiz-Installer-Bootstrap.exe`
+
+The Bootstrap downloads `Packwiz-Installer.exe` from the latest GitHub Release. Therefore, publish a new version tag after every installer update. Tags containing a hyphen (for example, `v1.1.0-rc.1`) are published as prereleases.
+
+You can also start the workflow manually from **Actions → Build and Release Windows EXE → Run workflow**. A manual run creates downloadable workflow artifacts but does not create a GitHub Release.
+
+## Local development and build
 
 Requires Python 3.11+ (uses the standard-library `tomllib`) and Tk support.
 
@@ -33,17 +54,11 @@ python installer.py https://example.com/pack.toml
 python installer.py -g -s server https://example.com/pack.toml
 ```
 
-## Build Windows executables
-
-Install PyInstaller and build each executable:
+For a local Windows build:
 
 ```powershell
-python -m pip install -r requirements.txt
-pyinstaller --onefile --noconsole --name Packwiz-Installer installer.py
-pyinstaller --onefile --noconsole --name Packwiz-Installer-Bootstrap bootstrap.py
+build.bat
 ```
-
-Publish the Installer executable as an asset named `Packwiz-Installer.exe` in a GitHub Release. The bootstrap downloads that asset from the latest release of the repository configured in `bootstrap.py`.
 
 ## Notes
 

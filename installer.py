@@ -19,7 +19,8 @@ from pathlib import Path
 from typing import Any
 
 APP_NAME = "Packwiz-Installer"
-USER_AGENT = "Packwiz-Installer-Python/0.1"
+APP_VERSION = "1.0.3"
+USER_AGENT = f"Packwiz-Installer-Python/{APP_VERSION}"
 
 
 def http_get(url: str, timeout: int = 30) -> bytes:

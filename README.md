@@ -1,5 +1,7 @@
 # Packwiz Installer Python
 
+Current version: **v1.0.3**
+
 Python/Tkinter implementation of a two-stage Packwiz installer for Windows.
 
 ## Architecture
